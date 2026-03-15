@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Quest — Master the Ancient Arts of JavaScript</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #04090a;
+  --bg-forest: #081410;
+  --forest-dark: #0d1e18;
+  --forest-mid: #142e22;
+  --forest-light: #1c4030;
+  --accent-green: #3a9e5a;
+  --bright-green: #52c97a;
+  --gold: #c9941a;
+  --gold-bright: #f5c842;
+  --amber: #e07c12;
+  --parchment: #f0dba8;
+  --parchment-dark: #d4c090;
+  --parchment-dim: #9e8a60;
+  --stone: #7a6650;
+  --text-light: #e4d09e;
+  --text-mid: #a8916a;
+  --text-dim: #6a5840;
+  --danger: #b83232;
+  --danger-light: #e84848;
+  --success: #2ea85c;
+  --success-light: #3edd78;
+  --shadow-deep: rgba(0,0,0,0.85);
+  --shadow: rgba(0,0,0,0.6);
+  --glow-gold: rgba(201,148,26,0.3);
+  --glow-green: rgba(58,158,90,0.25);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  color: var(--text-light);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+/* ── Forest background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(20,60,35,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(10,35,25,0.4) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(4,9,10,0) 0%, var(--bg-deep) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+/* Floating particles */
+.particle {
+  position: fixed;
+  width: 3px; height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: floatUp var(--dur, 8s) var(--delay, 0s) infinite ease-in;
+}
+@keyframes floatUp {
+  0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.2; }
+  100% { transform: translateY(-10vh) translateX(var(--drift, 30px)) scale(0.5); opacity: 0; }
+}
+
+/* ── Screen system ── */
+.screen { display: none; position: relative; z-index: 1; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ─────────────────────────────────────────
+   LANDING SCREEN
+───────────────────────────────────────── */
+#screen-landing {
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+.landing-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(58,158,90,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.landing-inner { position: relative; max-width: 520px; width: 100%; }
+.game-logo {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2.8rem, 8vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--amber) 50%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 24px rgba(201,148,26,0.4));
+  margin-bottom: 0.2rem;
+}
+.game-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-green);
+  margin-bottom: 3rem;
+}
+.rune-divider {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 1.5rem 0;
+  color: var(--stone);
+  font-size: 1.2rem;
+}
+.rune-divider::before, .rune-divider::after {
+  content: ''; flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stone), transparent);
+}
+.landing-desc {
+  font-size: 1.1rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  font-style: italic;
+}
+.name-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 0.5rem;
+  display: block;
+  text-align: left;
+}
+.name-input {
+  width: 100%;
+  background: rgba(20,46,34,0.7);
+  border: 1px solid var(--forest-light);
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 1.5rem;
+}
+.name-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--glow-gold);
+}
+.name-input::placeholder { color: var(--text-dim); font-style: italic; }
+.btn-begin {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #3a7a50 0%, #2a6040 100%);
+  color: var(--gold-bright);
+  border: 1px solid var(--accent-green);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(58,158,90,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.btn-begin:hover {
+  background: linear-gradient(135deg, #4a9a65 0%, #3a7a50 100%);
+  box-shadow: 0 6px 28px rgba(58,158,90,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+}
+.btn-begin:active { transform: translateY(0); }
+.stat-preview {
+  display: flex; justify-content: center; gap: 2rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.stat-item {
+  text-align: center;
+  opacity: 0.7;
+}
+.stat-number {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  display: block;
+}
+.stat-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ─────────────────────────────────────────
+   SHARED HEADER
+───────────────────────────────────────── */
+.game-header {
+  background: linear-gradient(180deg, rgba(8,20,16,0.98) 0%, rgba(8,20,16,0.9) 100%);
+  border-bottom: 1px solid rgba(58,158,90,0.2);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: sticky; top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+.header-logo {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  white-space: nowrap;
+}
+.header-player {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(20,46,34,0.5);
+  border: 1px solid rgba(58,158,90,0.25);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+}
+.header-player-icon { font-size: 1.1rem; }
+.header-player-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+.header-player-title {
+  font-size: 0.7rem;
+  color: var(--accent-green);
+  letter-spacing: 0.05em;
+}
+.header-xp-wrap {
+  flex: 1;
+  min-width: 160px;
+}
+.xp-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+.xp-bar-track {
+  height: 8px;
+  background: rgba(20,46,34,0.8);
+  border-radius: 4px;
+  border: 1px solid rgba(58,158,90,0.2);
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), var(--bright-green));
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(82,201,122,0.5);
+}
+.header-badge-count {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   MAP SCREEN
+───────────────────────────────────────── */
+#screen-map { background: none; }
+.map-body {
+  padding: 2rem 1.5rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+.map-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.3rem, 4vw, 1.9rem);
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+.map-subtitle {
+  text-align: center;
+  color: var(--text-mid);
+  font-style: italic;
+  font-size: 1rem;
+  margin-bottom: 2.5rem;
+}
+.worlds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.2rem;
+}
+.world-card {
+  background: linear-gradient(160deg, rgba(20,46,34,0.85) 0%, rgba(13,30,24,0.9) 100%);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 14px;
+  padding: 1.4rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.world-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+.world-card:not(.locked):hover {
+  border-color: var(--accent-green);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 20px var(--glow-green);
+}
+.world-card.completed {
+  border-color: rgba(201,148,26,0.4);
+}
+.world-card.completed:hover {
+  border-color: var(--gold);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 20px var(--glow-gold);
+}
+.world-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: saturate(0.3);
+}
+.world-card-accent {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+}
+.world-icon { font-size: 2.2rem; margin-bottom: 0.6rem; display: block; }
+.world-number {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.2rem;
+}
+.world-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+.world-topic {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  font-style: italic;
+  margin-bottom: 0.8rem;
+}
+.world-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.progress-dots {
+  display: flex; gap: 4px;
+}
+.progress-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--forest-light);
+  transition: background 0.2s;
+}
+.progress-dot.done { background: var(--bright-green); }
+.progress-dot.active { background: var(--gold); }
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+.world-xp-badge {
+  position: absolute; top: 1rem; right: 1rem;
+  background: rgba(201,148,26,0.15);
+  border: 1px solid rgba(201,148,26,0.3);
+  border-radius: 20px;
+  padding: 0.15rem 0.5rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+.world-lock-icon {
+  position: absolute; top: 0.9rem; right: 0.9rem;
+  font-size: 1.1rem;
+  opacity: 0.5;
+}
+.world-complete-badge {
+  position: absolute; top: 0.9rem; right: 0.9rem;
+  font-size: 1.1rem;
+}
+
+/* ─────────────────────────────────────────
+   WORLD SCREEN (Level List)
+───────────────────────────────────────── */
+#screen-world { background: none; }
+.world-screen-body {
+  padding: 2rem 1.5rem 4rem;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--text-light); }
+.world-screen-header {
+  background: linear-gradient(135deg, rgba(20,46,34,0.9) 0%, rgba(13,30,24,0.95) 100%);
+  border: 1px solid rgba(58,158,90,0.25);
+  border-radius: 16px;
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.world-screen-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+.world-screen-icon { font-size: 3rem; margin-bottom: 0.5rem; display: block; }
+.world-screen-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 0.3rem;
+}
+.world-screen-subtitle {
+  font-size: 1rem;
+  color: var(--text-mid);
+  font-style: italic;
+  margin-bottom: 0.8rem;
+}
+.world-screen-desc {
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+.world-badge-info {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(201,148,26,0.1);
+  border: 1px solid rgba(201,148,26,0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--gold);
+  width: fit-content;
+}
+.levels-trail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.level-connector {
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(180deg, var(--forest-light), transparent);
+  margin: 0 auto;
+}
+.level-item {
+  background: linear-gradient(160deg, rgba(20,46,34,0.85) 0%, rgba(13,30,24,0.9) 100%);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 12px;
+  padding: 1.1rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+.level-item:not(.locked):not(.completed):hover {
+  border-color: var(--accent-green);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.level-item.completed { border-color: rgba(201,148,26,0.3); }
+.level-item.locked { opacity: 0.45; cursor: not-allowed; }
+.level-status-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  background: var(--forest-dark);
+  border: 2px solid var(--forest-light);
+}
+.level-status-icon.done {
+  background: rgba(201,148,26,0.15);
+  border-color: var(--gold);
+}
+.level-status-icon.available {
+  background: rgba(58,158,90,0.15);
+  border-color: var(--accent-green);
+  animation: pulseGreen 2s infinite;
+}
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(58,158,90,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(58,158,90,0); }
+}
+.level-info { flex: 1; }
+.level-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+.level-type-tag {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+.level-xp {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   CHALLENGE SCREEN
+───────────────────────────────────────── */
+#screen-challenge { background: none; }
+.challenge-body {
+  padding: 1.5rem 1.5rem 4rem;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+}
+.challenge-breadcrumb {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.breadcrumb-sep { color: var(--forest-light); }
+.breadcrumb-current { color: var(--text-mid); }
+.lesson-box {
+  background: linear-gradient(160deg, #1a0e05 0%, #120a02 100%);
+  border: 1px solid rgba(201,148,26,0.25);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.lesson-box::before {
+  content: '📜 Lore';
+  position: absolute; top: -10px; left: 16px;
+  background: linear-gradient(90deg, #c9941a, #a07010);
+  color: #1a0e05;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+.lesson-text {
+  font-size: 0.97rem;
+  color: var(--parchment);
+  line-height: 1.7;
+}
+.lesson-text code {
+  font-family: 'Fira Code', monospace;
+  background: rgba(58,158,90,0.15);
+  border: 1px solid rgba(58,158,90,0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.88em;
+  color: var(--bright-green);
+}
+.challenge-card {
+  background: linear-gradient(160deg, rgba(20,46,34,0.9) 0%, rgba(13,30,24,0.95) 100%);
+  border: 1px solid rgba(58,158,90,0.25);
+  border-radius: 14px;
+  padding: 1.8rem;
+}
+.challenge-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.challenge-type-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(58,158,90,0.15);
+  border: 1px solid rgba(58,158,90,0.3);
+  border-radius: 20px;
+  padding: 0.25rem 0.7rem;
+  color: var(--accent-green);
+}
+.challenge-xp-hint {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-left: auto;
+}
+.challenge-question {
+  font-size: 1.15rem;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+.challenge-question code {
+  font-family: 'Fira Code', monospace;
+  background: rgba(58,158,90,0.12);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.9em;
+  color: var(--bright-green);
+}
+/* MCQ */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+.option-btn {
+  background: rgba(13,30,24,0.8);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  transition: all 0.15s;
+  text-align: left;
+}
+.option-btn:hover {
+  border-color: var(--accent-green);
+  background: rgba(58,158,90,0.1);
+}
+.option-btn.selected {
+  border-color: var(--gold);
+  background: rgba(201,148,26,0.12);
+  box-shadow: 0 0 12px var(--glow-gold);
+}
+.option-key {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  background: rgba(58,158,90,0.15);
+  border-radius: 5px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.option-btn.selected .option-key { background: rgba(201,148,26,0.2); color: var(--gold); }
+.option-text {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  font-family: 'Fira Code', monospace;
+}
+/* True/False */
+.tf-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.tf-statement {
+  background: rgba(13,30,24,0.6);
+  border: 1px solid rgba(58,158,90,0.15);
+  border-radius: 10px;
+  padding: 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9rem;
+  color: var(--parchment);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+.tf-btn {
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tf-btn.true-btn {
+  background: rgba(46,168,92,0.1);
+  border-color: rgba(46,168,92,0.3);
+  color: var(--success-light);
+}
+.tf-btn.true-btn:hover, .tf-btn.true-btn.selected {
+  background: rgba(46,168,92,0.2);
+  border-color: var(--success);
+  box-shadow: 0 0 16px rgba(46,168,92,0.3);
+}
+.tf-btn.false-btn {
+  background: rgba(184,50,50,0.1);
+  border-color: rgba(184,50,50,0.3);
+  color: #e86868;
+}
+.tf-btn.false-btn:hover, .tf-btn.false-btn.selected {
+  background: rgba(184,50,50,0.2);
+  border-color: var(--danger);
+  box-shadow: 0 0 16px rgba(184,50,50,0.3);
+}
+.tf-icon { font-size: 1.8rem; }
+/* Fill in blank */
+.fill-code {
+  background: rgba(4,9,10,0.9);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 10px;
+  padding: 1.2rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.93rem;
+  color: var(--parchment);
+  line-height: 1.8;
+  margin-bottom: 1.2rem;
+  white-space: pre-wrap;
+}
+.fill-blank {
+  display: inline-block;
+  min-width: 80px;
+  background: rgba(58,158,90,0.1);
+  border-bottom: 2px solid var(--gold);
+  padding: 0 4px;
+  color: var(--gold-bright);
+  font-family: 'Fira Code', monospace;
+}
+.fill-input-wrap {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.fill-label {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+.fill-input {
+  flex: 1;
+  background: rgba(13,30,24,0.8);
+  border: 1px solid rgba(58,158,90,0.3);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  color: var(--bright-green);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fill-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--glow-gold);
+}
+/* Match / Drag-Drop */
+.match-instruction {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+.match-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 480px) {
+  .match-container { grid-template-columns: 1fr; }
+}
+.match-col-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+.match-item {
+  background: rgba(13,30,24,0.8);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.88rem;
+  color: var(--parchment);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  transition: all 0.15s;
+  user-select: none;
+}
+.match-item:hover:not(.matched):not(.hidden) {
+  border-color: var(--accent-green);
+  background: rgba(58,158,90,0.1);
+}
+.match-item.selected {
+  border-color: var(--gold-bright);
+  background: rgba(201,148,26,0.15);
+  box-shadow: 0 0 12px var(--glow-gold);
+}
+.match-item.matched { opacity: 0.35; cursor: default; }
+.match-item.hidden { visibility: hidden; pointer-events: none; }
+.match-slot {
+  background: rgba(4,9,10,0.6);
+  border: 1px dashed rgba(58,158,90,0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 0.5rem;
+  min-height: 44px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.match-slot:hover { border-color: rgba(201,148,26,0.4); }
+.match-slot.filled { border-style: solid; border-color: rgba(58,158,90,0.4); }
+.slot-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.slot-placed {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+  flex: 1;
+}
+/* Submit button */
+.btn-submit {
+  width: 100%;
+  padding: 0.9rem 2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #3a7a50 0%, #2a6040 100%);
+  color: var(--gold-bright);
+  border: 1px solid var(--accent-green);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(58,158,90,0.25);
+}
+.btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4a9a65 0%, #3a7a50 100%);
+  box-shadow: 0 6px 24px rgba(58,158,90,0.4);
+  transform: translateY(-2px);
+}
+.btn-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─────────────────────────────────────────
+   RESULT SCREEN
+───────────────────────────────────────── */
+#screen-result { align-items: center; justify-content: center; padding: 2rem; }
+.result-card {
+  background: linear-gradient(160deg, rgba(20,46,34,0.95) 0%, rgba(13,30,24,0.98) 100%);
+  border: 1px solid rgba(58,158,90,0.3);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.result-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: block;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.result-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.result-title.correct { color: var(--success-light); }
+.result-title.incorrect { color: #e86868; }
+.result-xp {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--gold-bright);
+  margin-bottom: 1.2rem;
+  animation: fadeIn 0.5s 0.3s both;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.result-explanation {
+  background: rgba(13,30,24,0.7);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  text-align: left;
+  animation: fadeIn 0.5s 0.4s both;
+}
+.result-explanation strong { color: var(--text-light); }
+.result-explanation code {
+  font-family: 'Fira Code', monospace;
+  background: rgba(58,158,90,0.1);
+  border: 1px solid rgba(58,158,90,0.2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 0.88em;
+  color: var(--bright-green);
+}
+.result-btns {
+  display: flex; gap: 0.8rem;
+  animation: fadeIn 0.5s 0.5s both;
+}
+.btn-continue {
+  flex: 2;
+  padding: 0.9rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #3a7a50 0%, #2a6040 100%);
+  color: var(--gold-bright);
+  border: 1px solid var(--accent-green);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-continue:hover {
+  background: linear-gradient(135deg, #4a9a65 0%, #3a7a50 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(58,158,90,0.35);
+}
+.btn-retry {
+  flex: 1;
+  padding: 0.9rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  background: transparent;
+  border: 1px solid rgba(58,158,90,0.25);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-retry:hover { border-color: var(--accent-green); color: var(--text-light); }
+/* Badge unlock */
+.badge-unlock {
+  background: linear-gradient(135deg, rgba(201,148,26,0.12) 0%, rgba(201,148,26,0.05) 100%);
+  border: 1px solid rgba(201,148,26,0.4);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.2rem;
+  animation: fadeIn 0.5s 0.6s both;
+  text-align: center;
+}
+.badge-unlock-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+.badge-icon { font-size: 2.2rem; display: block; }
+.badge-name { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--gold-bright); }
+/* Confetti */
+.confetti-piece {
+  position: fixed;
+  width: 10px; height: 10px;
+  opacity: 0;
+  animation: confettiFall 1.5s ease-in forwards;
+  pointer-events: none;
+  z-index: 200;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ─────────────────────────────────────────
+   UTILITIES
+───────────────────────────────────────── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div id="particles"></div>
+
+<div id="app">
+
+  <!-- ═══ LANDING SCREEN ═══ -->
+  <div id="screen-landing" class="screen active">
+    <div class="landing-glow"></div>
+    <div class="landing-inner">
+      <div class="game-logo">JS Quest</div>
+      <div class="game-tagline">⚔ Master the Ancient Arts of JavaScript ⚔</div>
+      <div class="rune-divider">✦</div>
+      <p class="landing-desc">
+        Embark on an epic quest through seven enchanted realms.<br>
+        Master the arcane arts of JavaScript — from first runes to ancient magic.
+      </p>
+      <label class="name-label" for="name-input">Your Adventurer's Name</label>
+      <input type="text" id="name-input" class="name-input" placeholder="Enter your name, brave soul..." maxlength="24">
+      <button class="btn-begin" onclick="beginQuest()">⚔ Begin the Quest ⚔</button>
+      <div class="stat-preview">
+        <div class="stat-item">
+          <span class="stat-number">7</span>
+          <span class="stat-label">Realms</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">35</span>
+          <span class="stat-label">Levels</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">4</span>
+          <span class="stat-label">Challenge Types</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">2450</span>
+          <span class="stat-label">Total XP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAP SCREEN ═══ -->
+  <div id="screen-map" class="screen">
+    <div class="game-header">
+      <div class="header-logo">JS Quest</div>
+      <div class="header-player">
+        <span class="header-player-icon" id="hdr-icon">🌱</span>
+        <div>
+          <div class="header-player-name" id="hdr-name">Adventurer</div>
+          <div class="header-player-title" id="hdr-title">Novice</div>
+        </div>
+      </div>
+      <div class="header-xp-wrap">
+        <div class="xp-label">
+          <span id="hdr-xp-label">XP Progress</span>
+          <span id="hdr-xp-nums">0 / 300</span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="hdr-xp-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="header-badge-count" id="hdr-badges">🏅 0 / 7</div>
+    </div>
+    <div class="map-body">
+      <h1 class="map-title">⚔ The Realm of JavaScript ⚔</h1>
+      <p class="map-subtitle">Choose your next adventure, brave scholar</p>
+      <div class="worlds-grid" id="worlds-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══ WORLD SCREEN ═══ -->
+  <div id="screen-world" class="screen">
+    <div class="game-header">
+      <div class="header-logo">JS Quest</div>
+      <div class="header-player">
+        <span class="header-player-icon" id="hdr-icon-2">🌱</span>
+        <div>
+          <div class="header-player-name" id="hdr-name-2">Adventurer</div>
+          <div class="header-player-title" id="hdr-title-2">Novice</div>
+        </div>
+      </div>
+      <div class="header-xp-wrap">
+        <div class="xp-label">
+          <span>XP Progress</span>
+          <span id="hdr-xp-nums-2">0 / 300</span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="hdr-xp-bar-2" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="world-screen-body" id="world-screen-body"></div>
+  </div>
+
+  <!-- ═══ CHALLENGE SCREEN ═══ -->
+  <div id="screen-challenge" class="screen">
+    <div class="game-header">
+      <div class="header-logo">JS Quest</div>
+      <div class="header-xp-wrap">
+        <div class="xp-label">
+          <span id="hdr-xp-label-3">XP Progress</span>
+          <span id="hdr-xp-nums-3">0 / 300</span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="hdr-xp-bar-3" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="challenge-body" id="challenge-body"></div>
+  </div>
+
+  <!-- ═══ RESULT SCREEN ═══ -->
+  <div id="screen-result" class="screen">
+    <div class="result-card" id="result-card"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// GAME DATA — 7 Worlds × 5 Levels = 35 Challenges
+// ═══════════════════════════════════════════════════
+const WORLDS = [
+{
+  id:'w1', name:'The Verdant Valley', emoji:'🌿', subtitle:'Variables & Data Types',
+  desc:'Where the ancient Runes of Variables lie hidden among the roots. Learn to name and store the world\'s essence.',
+  color:'#2d7a2d', badge:{icon:'🌱',name:'Seedling Scholar'}, worldXP:100,
+  levels:[
+    {id:'w1l1', name:'The First Rune', xp:50, type:'mcq',
+     lesson:'In JavaScript, we use <code>let</code>, <code>const</code>, and <code>var</code> to declare variables. <code>let</code> allows reassignment, <code>const</code> creates a constant, and <code>var</code> is the old way (best avoided in modern code).',
+     challenge:{type:'mcq', question:'Which keyword declares a variable that CANNOT be reassigned?',
+       options:['let','var','const','def'], correct:2,
+       explain:'<code>const</code> declares a constant. Reassigning it throws a TypeError. <code>let</code> allows reassignment. <code>var</code> is old-style. <code>def</code> doesn\'t exist in JavaScript!'}},
+    {id:'w1l2', name:'Scrolls of Type', xp:50, type:'truefalse',
+     lesson:'JavaScript has <strong>7 primitive types</strong>: <code>string</code>, <code>number</code>, <code>bigint</code>, <code>boolean</code>, <code>undefined</code>, <code>symbol</code>, and <code>null</code>. Everything else is an <code>object</code>.',
+     challenge:{type:'truefalse', statement:'JavaScript has exactly 7 primitive data types.', correct:true,
+       explain:'<strong>True!</strong> The 7 primitives are: string, number, bigint, boolean, undefined, symbol, and null. Arrays and objects are not primitives — they are reference types.'}},
+    {id:'w1l3', name:'The Name Spell', xp:50, type:'fillin',
+     lesson:'Template literals use <code>backticks</code> and <code>${expression}</code> to embed values into strings. They\'re far more readable than string concatenation.',
+     challenge:{type:'fillin', question:'Complete the template literal to greet the user by name:',
+       codeParts:['const name = "Aragorn";\nconst greeting = `Hail, ','','!`;'],
+       blank:'${name}', accept:['${name}'],
+       explain:'Template literals use <code>${variable}</code> to embed expressions. The result would be: "Hail, Aragorn!"'}},
+    {id:'w1l4', name:'The Sorter\'s Art', xp:50, type:'match',
+     lesson:'Each value in JavaScript has a type. Use <code>typeof x</code> to inspect it. Knowing your types is fundamental to avoiding bugs.',
+     challenge:{type:'match', question:'Match each value to its JavaScript data type:',
+       pairs:[{item:'"hello"',match:'string'},{item:'42',match:'number'},{item:'true',match:'boolean'},{item:'null',match:'object*'}],
+       explain:'<strong>Trick alert!</strong> <code>typeof null</code> returns <code>"object"</code> — this is a famous JavaScript bug that was kept for backwards compatibility. All other matches are straightforward.'}},
+    {id:'w1l5', name:'The Null Paradox', xp:75, type:'mcq',
+     lesson:'<code>typeof</code> returns a string describing the type of a value. Most results are predictable — except one infamous quirk involving <code>null</code>.',
+     challenge:{type:'mcq', question:'What does typeof null return in JavaScript?',
+       options:['"null"','"undefined"','"object"','"nothing"'], correct:2,
+       explain:'"object" — this is a historic bug in JavaScript! <code>null</code> is a primitive, but <code>typeof null</code> returns <code>"object"</code>. It was never fixed to avoid breaking existing code.'}}
+  ]
+},
+{
+  id:'w2', name:'The Crossroads', emoji:'⚔️', subtitle:'Operators & Flow Control',
+  desc:'Where paths diverge and decisions are made. Master the art of choosing your course through conditionals and loops.',
+  color:'#b8860b', badge:{icon:'🗺️',name:'Path Finder'}, worldXP:100,
+  levels:[
+    {id:'w2l1', name:'The Truth Seeker', xp:50, type:'truefalse',
+     lesson:'JavaScript has two equality operators: <code>==</code> (loose equality, allows type coercion) and <code>===</code> (strict equality, checks both value AND type). Always prefer <code>===</code>.',
+     challenge:{type:'truefalse', statement:'The strict equality operator === checks both value AND type.',correct:true,
+       explain:'<strong>True!</strong> <code>===</code> is strict: <code>5 === "5"</code> is false. The loose <code>==</code> would coerce types and return true. Always use <code>===</code> to avoid subtle bugs.'}},
+    {id:'w2l2', name:'The Remainder Rune', xp:50, type:'mcq',
+     lesson:'The <strong>modulo operator</strong> <code>%</code> returns the remainder after division. It\'s extremely useful for checking if numbers are even/odd or cycling through values.',
+     challenge:{type:'mcq', question:'What does 17 % 5 evaluate to?',
+       options:['3','2','4','1'], correct:1,
+       explain:'17 divided by 5 = 3 remainder 2. So <code>17 % 5 === 2</code>. The modulo operator gives you the remainder, not the quotient.'}},
+    {id:'w2l3', name:'The Fork in the Road', xp:50, type:'fillin',
+     lesson:'<code>if / else if / else</code> statements let your code make decisions. The condition inside <code>if()</code> is evaluated as truthy or falsy.',
+     challenge:{type:'fillin', question:'Fill in the missing operator to check if age is at least 18:',
+       codeParts:['if (age ','',18, ') {\n  console.log("Welcome!");\n}'],
+       blank:'>=', accept:['>='],
+       explain:'<code>>=</code> is the "greater than or equal to" operator. It returns true if the left value is equal to or greater than the right. So <code>18 >= 18</code> is true, and <code>19 >= 18</code> is also true.'}},
+    {id:'w2l4', name:'The Loop Scroll', xp:50, type:'mcq',
+     lesson:'<code>for</code>, <code>while</code>, and <code>do...while</code> loops repeat code. The key difference: <code>do...while</code> always runs at least once since it checks the condition <em>after</em> the first iteration.',
+     challenge:{type:'mcq', question:'Which loop is GUARANTEED to run at least once, even if its condition starts as false?',
+       options:['for loop','while loop','do...while loop','forEach loop'], correct:2,
+       explain:'The <code>do...while</code> loop executes its body first, THEN checks the condition. So even if the condition is false from the start, the loop body runs once.'}},
+    {id:'w2l5', name:'The Logic Gates', xp:75, type:'match',
+     lesson:'Logical operators combine boolean expressions. <code>&&</code> requires both sides to be true, <code>||</code> requires at least one, and <code>!</code> inverts the result.',
+     challenge:{type:'match', question:'Match each operator to its meaning:',
+       pairs:[{item:'&&',match:'AND (both true)'},{item:'||',match:'OR (either true)'},{item:'!',match:'NOT (invert)'},{item:'??',match:'Nullish coalescing'}],
+       explain:'<code>&&</code> = AND (all must be true), <code>||</code> = OR (at least one true), <code>!</code> = NOT (inverts boolean). The <code>??</code> nullish coalescing operator returns the right side only when the left is <code>null</code> or <code>undefined</code>.'}}
+  ]
+},
+{
+  id:'w3', name:'The Wizard\'s Tower', emoji:'🧙', subtitle:'Functions',
+  desc:'The tower where spells are bottled and named. Learn to encapsulate magic into reusable incantations.',
+  color:'#6b3da0', badge:{icon:'🔮',name:'Spell Binder'}, worldXP:100,
+  levels:[
+    {id:'w3l1', name:'Bottling a Spell', xp:50, type:'truefalse',
+     lesson:'Functions are reusable blocks of code. Arrow functions <code>() => {}</code> and regular function declarations have a key difference: arrow functions do NOT have their own <code>this</code> context.',
+     challenge:{type:'truefalse', statement:'Arrow functions have their own this context, just like regular functions.',correct:false,
+       explain:'<strong>False!</strong> Arrow functions do NOT have their own <code>this</code>. They inherit <code>this</code> from the surrounding (lexical) scope. Regular function declarations and expressions DO create their own <code>this</code>.'}},
+    {id:'w3l2', name:'The Incantation\'s Return', xp:50, type:'mcq',
+     lesson:'A function that has no <code>return</code> statement still returns something. Understanding this default behavior is crucial for debugging unexpected <code>undefined</code> values.',
+     challenge:{type:'mcq', question:'What does a function return by default when there is no return statement?',
+       options:['null','0','false','undefined'], correct:3,
+       explain:'Functions without an explicit <code>return</code> return <code>undefined</code>. This is a common source of bugs — for example, forgetting to return a value from a function used in an expression.'}},
+    {id:'w3l3', name:'The Arrow Rune', xp:50, type:'fillin',
+     lesson:'Arrow functions provide a concise syntax. Single-expression arrow functions can omit the curly braces and return keyword: <code>const fn = (x) => x * 2</code> implicitly returns the expression.',
+     challenge:{type:'fillin', question:'Complete the arrow function:',
+       codeParts:['const multiply = (a, b) ','','a * b;'],
+       blank:'=>', accept:['=>'],
+       explain:'The <code>=></code> "fat arrow" separates parameters from the function body. In this concise form (no curly braces), the expression is implicitly returned: <code>multiply(3, 4)</code> returns 12.'}},
+    {id:'w3l4', name:'Scope of the Realm', xp:50, type:'mcq',
+     lesson:'<strong>Scope</strong> determines where variables are accessible. Variables declared inside a function are local (not accessible outside). Variables declared outside are in the outer/global scope.',
+     challenge:{type:'mcq', question:'What will this code log?\n\nfunction greet() {\n  const msg = "Hello";\n}\ngreet();\nconsole.log(msg);',
+       options:['"Hello"','undefined','null','ReferenceError'], correct:3,
+       explain:'A <code>ReferenceError</code> is thrown! <code>msg</code> is declared with <code>const</code> inside the function, so it only exists within that function\'s scope. Trying to access it outside throws an error.'}},
+    {id:'w3l5', name:'The Default Enchantment', xp:75, type:'match',
+     lesson:'Default parameters let you specify fallback values if an argument is not passed. This avoids having to check for <code>undefined</code> inside the function body.',
+     challenge:{type:'match', question:'Match each function concept to its description:',
+       pairs:[{item:'Default param',match:'Fallback when arg missing'},{item:'Rest params ...',match:'Collects extra args into array'},{item:'Callback',match:'Function passed as argument'},{item:'Higher-order fn',match:'Takes/returns a function'}],
+       explain:'Default params <code>fn(x=1)</code> handle missing args. Rest <code>...args</code> collects extras into an array. Callbacks are functions passed to other functions. Higher-order functions accept or return functions (like <code>map</code>, <code>filter</code>).'}}
+  ]
+},
+{
+  id:'w4', name:'The Dragon\'s Hoard', emoji:'🐉', subtitle:'Arrays & Objects',
+  desc:'The dragon jealously guards vast collections of treasure. Learn to tame, sort, and search these mighty data structures.',
+  color:'#c0392b', badge:{icon:'💎',name:'Hoard Master'}, worldXP:100,
+  levels:[
+    {id:'w4l1', name:'The Treasure Index', xp:50, type:'mcq',
+     lesson:'Arrays store ordered collections. Items are accessed by their <strong>zero-based index</strong> — the first element is at index 0, the second at index 1, and so on.',
+     challenge:{type:'mcq', question:'How do you access the THIRD element of an array called items?',
+       options:['items[3]','items[2]','items(2)','items.get(3)'], correct:1,
+       explain:'Arrays are zero-indexed, so the first element is <code>items[0]</code>, second is <code>items[1]</code>, and third is <code>items[2]</code>. This catches many beginners off guard!'}},
+    {id:'w4l2', name:'Growing the Hoard', xp:50, type:'fillin',
+     lesson:'<code>push()</code> adds an item to the END of an array. <code>pop()</code> removes and returns the last item. <code>unshift()</code> adds to the front, <code>shift()</code> removes from the front.',
+     challenge:{type:'fillin', question:'Add "shield" to the end of the weapons array:',
+       codeParts:['const weapons = ["sword", "bow"];\nweapons.','','("shield");\n// ["sword", "bow", "shield"]'],
+       blank:'push', accept:['push'],
+       explain:'<code>array.push(value)</code> appends an item to the end and returns the new length. It mutates the original array. To non-destructively add items, use the spread operator: <code>[...weapons, "shield"]</code>.'}},
+    {id:'w4l3', name:'The Object Vault', xp:50, type:'truefalse',
+     lesson:'Objects store key-value pairs. Keys can be strings OR ES6 <code>Symbol</code>s. You can access values using dot notation (<code>obj.key</code>) or bracket notation (<code>obj["key"]</code>).',
+     challenge:{type:'truefalse', statement:'Object keys in JavaScript can ONLY be strings.',correct:false,
+       explain:'<strong>False!</strong> Object keys can be strings OR <code>Symbol</code>s. Symbols are unique identifiers often used for "hidden" object properties. When you write <code>{ name: "Frodo" }</code>, "name" is automatically converted to a string key.'}},
+    {id:'w4l4', name:'Array Alchemy', xp:50, type:'match',
+     lesson:'Array methods are incredibly powerful. <code>map()</code>, <code>filter()</code>, <code>reduce()</code>, and <code>find()</code> transform arrays without mutating them, returning new arrays or values.',
+     challenge:{type:'match', question:'Match each array method to what it does:',
+       pairs:[{item:'.map()',match:'Transform every element'},{item:'.filter()',match:'Keep matching elements'},{item:'.reduce()',match:'Accumulate into one value'},{item:'.find()',match:'Return first match'}],
+       explain:'<code>map</code> transforms, <code>filter</code> selects, <code>reduce</code> accumulates, <code>find</code> locates first match. These are the "holy trinity" of array methods every JS developer must master!'}},
+    {id:'w4l5', name:'Destructuring Runes', xp:75, type:'fillin',
+     lesson:'<strong>Destructuring</strong> lets you unpack values from arrays and objects into variables. It\'s concise and expressive: <code>const { name, age } = person</code>.',
+     challenge:{type:'fillin', question:'Destructure to get the first element as "first" and collect the rest:',
+       codeParts:['const [first, ','','rest] = [10, 20, 30, 40];\n// first = 10, rest = [20,30,40]'],
+       blank:'...', accept:['...'],
+       explain:'The <code>...</code> rest syntax collects remaining elements into an array. So <code>const [first, ...rest] = [10,20,30,40]</code> gives <code>first = 10</code> and <code>rest = [20,30,40]</code>.'}}
+  ]
+},
+{
+  id:'w5', name:'The Enchanted Forest', emoji:'🌳', subtitle:'DOM Manipulation',
+  desc:'Where the real world and the code world intertwine. Learn to reshape the living document with JavaScript\'s mystical DOM powers.',
+  color:'#1a7a6a', badge:{icon:'🌲',name:'Forest Weaver'}, worldXP:100,
+  levels:[
+    {id:'w5l1', name:'Finding the Sacred Tree', xp:50, type:'mcq',
+     lesson:'The DOM (Document Object Model) represents your HTML as a tree of nodes. To manipulate elements, first select them using methods like <code>getElementById</code>, <code>querySelector</code>, or <code>querySelectorAll</code>.',
+     challenge:{type:'mcq', question:'Which method selects an element by its id attribute?',
+       options:['document.querySelector(".id")','document.getElementByClass("id")','document.getElementById("id")','document.selectById("id")'], correct:2,
+       explain:'<code>document.getElementById("id")</code> returns a single element by its ID. Note: you do NOT include the # symbol here (unlike <code>querySelector</code>). If no match, it returns <code>null</code>.'}},
+    {id:'w5l2', name:'Shaping the Forest', xp:50, type:'fillin',
+     lesson:'Once you have an element reference, you can change its content. Use <code>textContent</code> for plain text (safer — it won\'t parse HTML), or <code>innerHTML</code> to set HTML content.',
+     challenge:{type:'fillin', question:'Update the element\'s text safely (without parsing HTML):',
+       codeParts:['const title = document.getElementById("title");\ntitle.','',' = "Welcome, Hero!";'],
+       blank:'textContent', accept:['textContent','innerText'],
+       explain:'<code>textContent</code> sets or gets the raw text of an element, treating the value as plain text (safe from XSS). <code>innerHTML</code> also works but parses HTML — be careful with user input!'}},
+    {id:'w5l3', name:'The Listening Sentinel', xp:50, type:'truefalse',
+     lesson:'<code>addEventListener</code> attaches an event handler to an element. It\'s the modern way to listen for user interactions. The "click" event fires when an element is clicked.',
+     challenge:{type:'truefalse', statement:'document.querySelector() returns ALL elements that match the CSS selector.',correct:false,
+       explain:'<strong>False!</strong> <code>querySelector()</code> returns only the FIRST matching element. To get all matches, use <code>querySelectorAll()</code>, which returns a NodeList (similar to an array).'}},
+    {id:'w5l4', name:'Summoning New Life', xp:50, type:'mcq',
+     lesson:'You can create new HTML elements with <code>document.createElement("tag")</code>, set their properties, then add them to the DOM with <code>appendChild()</code> or <code>insertAdjacentElement()</code>.',
+     challenge:{type:'mcq', question:'After creating an element, which method adds it as a child of another element?',
+       options:['element.addChild()','element.appendChild()','element.insert()','element.attach()'], correct:1,
+       explain:'<code>parent.appendChild(newElement)</code> adds the new element as the last child of the parent. Modern alternatives include <code>parent.append()</code> (also accepts text) and <code>prepend()</code> (inserts at the beginning).'}},
+    {id:'w5l5', name:'The Event Grimoire', xp:75, type:'match',
+     lesson:'Events are signals that something happened — a click, a key press, a page load. Attaching the right event listener is key to interactive pages.',
+     challenge:{type:'match', question:'Match each event name to when it fires:',
+       pairs:[{item:'"click"',match:'Element is clicked'},{item:'"keydown"',match:'Keyboard key pressed'},{item:'"submit"',match:'Form is submitted'},{item:'"DOMContentLoaded"',match:'HTML fully parsed'}],
+       explain:'<code>click</code> fires on mouse/touch click, <code>keydown</code> fires when any key is pressed, <code>submit</code> fires when a form is submitted, and <code>DOMContentLoaded</code> fires when the HTML is parsed (before images/CSS load).'}}
+  ]
+},
+{
+  id:'w6', name:'The Storm Peaks', emoji:'⚡', subtitle:'Async JavaScript',
+  desc:'Where lightning strikes and time bends. Tame the asynchronous storms with Promises, callbacks, and the powerful async/await magic.',
+  color:'#2c5f8a', badge:{icon:'⛈️',name:'Storm Tamer'}, worldXP:100,
+  levels:[
+    {id:'w6l1', name:'The Three States', xp:50, type:'truefalse',
+     lesson:'A <strong>Promise</strong> is an object representing the eventual completion or failure of an async operation. It exists in one of three states: <strong>pending</strong>, <strong>fulfilled</strong> (resolved), or <strong>rejected</strong>.',
+     challenge:{type:'truefalse', statement:'A JavaScript Promise can be in one of three states: pending, fulfilled, or rejected.',correct:true,
+       explain:'<strong>True!</strong> A Promise starts as <em>pending</em>, then either becomes <em>fulfilled</em> (success) or <em>rejected</em> (failure). Once settled, it cannot change state. Use <code>.then()</code> for fulfillment and <code>.catch()</code> for rejection.'}},
+    {id:'w6l2', name:'Chaining the Storm', xp:50, type:'fillin',
+     lesson:'<code>.then()</code> handles a fulfilled Promise and can return another Promise, enabling <em>chaining</em>. <code>.catch()</code> handles errors. <code>fetch()</code> returns a Promise, commonly chained with <code>.then(r => r.json())</code>.',
+     challenge:{type:'fillin', question:'Complete the fetch call to parse the JSON response:',
+       codeParts:['fetch("https://api.example.com/data")\n  .','','(response => response.json())\n  .then(data => console.log(data));'],
+       blank:'then', accept:['then'],
+       explain:'<code>.then(callback)</code> attaches a handler for when the Promise resolves. <code>fetch()</code> first resolves with a Response object, so you chain another <code>.then(r => r.json())</code> to parse the body as JSON.'}},
+    {id:'w6l3', name:'The Await Spell', xp:50, type:'mcq',
+     lesson:'<code>async/await</code> makes asynchronous code look and behave like synchronous code. An <code>async</code> function always returns a Promise. <code>await</code> pauses execution until the awaited Promise settles.',
+     challenge:{type:'mcq', question:'What does the await keyword do inside an async function?',
+       options:['Cancels the Promise','Pauses execution until the Promise resolves','Converts a Promise to a callback','Runs code in parallel'], correct:1,
+       explain:'<code>await</code> pauses execution of the <em>async function</em> (not the whole program!) until the Promise settles. If the Promise resolves, it returns the value. If rejected, it throws an error (catch with try/catch).'}},
+    {id:'w6l4', name:'The Error Ward', xp:50, type:'truefalse',
+     lesson:'<code>try...catch</code> is how you handle errors in async/await code. Place your <code>await</code> calls inside <code>try</code>, and handle failures in <code>catch(error)</code>. Always handle your errors!',
+     challenge:{type:'truefalse', statement:'You should use try/catch to handle errors when using async/await.',correct:true,
+       explain:'<strong>True!</strong> Without try/catch, a rejected Promise inside an async function will cause an unhandled Promise rejection. Wrapping your <code>await</code> in try/catch lets you gracefully handle failures.'}},
+    {id:'w6l5', name:'Async Mastery', xp:75, type:'match',
+     lesson:'Understanding when to use each async pattern is critical. Callbacks were the original approach, Promises improved chaining, and async/await makes code most readable.',
+     challenge:{type:'match', question:'Match each async concept to its description:',
+       pairs:[{item:'Promise.all()',match:'Wait for ALL promises'},{item:'Promise.race()',match:'Resolve with fastest'},{item:'.catch()',match:'Handle rejection'},{item:'async fn',match:'Returns a Promise'}],
+       explain:'<code>Promise.all()</code> waits for all promises (or fails fast on first rejection). <code>Promise.race()</code> resolves/rejects with whichever settles first. <code>.catch()</code> handles rejection. An <code>async</code> function automatically wraps its return in a Promise.'}}
+  ]
+},
+{
+  id:'w7', name:'The Ancient Ruins', emoji:'🏛️', subtitle:'Advanced Concepts',
+  desc:'The crumbling ruins hold the oldest, most powerful JavaScript wisdom. Closures, prototypes, and the secrets of ES6+ await the worthy.',
+  color:'#8b2020', badge:{icon:'👑',name:'Archmage of JS'}, worldXP:100,
+  levels:[
+    {id:'w7l1', name:'The Closure Vault', xp:50, type:'mcq',
+     lesson:'A <strong>closure</strong> is a function that "remembers" variables from its outer (lexical) scope, even after the outer function has finished executing. This is one of JavaScript\'s most powerful features.',
+     challenge:{type:'mcq', question:'What is a closure in JavaScript?',
+       options:['A function with no parameters','A function that remembers its outer scope variables','A function that runs immediately','A private class method'], correct:1,
+       explain:'A closure is a function that retains access to variables from its containing scope, even after the outer function returns. They\'re used for data privacy, factory functions, and maintaining state.'}},
+    {id:'w7l2', name:'The Prototype Stone', xp:50, type:'truefalse',
+     lesson:'In JavaScript, objects have a prototype chain. When you access a property, JS walks up the chain until it finds it. <code>class</code> syntax is syntactic sugar over this prototype-based inheritance.',
+     challenge:{type:'truefalse', statement:'JavaScript class syntax is syntactic sugar built on top of prototype-based inheritance.',correct:true,
+       explain:'<strong>True!</strong> JavaScript is fundamentally prototype-based, not class-based. The <code>class</code> keyword (introduced in ES6) just provides a cleaner syntax — under the hood it still uses prototypes and constructor functions.'}},
+    {id:'w7l3', name:'The Spread Enchantment', xp:50, type:'fillin',
+     lesson:'The <strong>spread operator</strong> <code>...</code> expands an iterable (array, string, object) into individual elements. It\'s used for copying, merging, and passing dynamic arguments.',
+     challenge:{type:'fillin', question:'Merge two arrays into a new one using spread:',
+       codeParts:['const a = [1, 2, 3];\nconst b = [4, 5, 6];\nconst merged = [','...a, ...b','];\n// [1, 2, 3, 4, 5, 6]'],
+       blank:'...a, ...b', accept:['...a, ...b','...a,...b'],
+       explain:'The spread operator <code>...</code> unpacks each element of the array. <code>[...a, ...b]</code> creates a new array containing all elements of <code>a</code> followed by all elements of <code>b</code>. Much cleaner than <code>a.concat(b)</code>!'}},
+    {id:'w7l4', name:'The Class Codex', xp:50, type:'mcq',
+     lesson:'ES6 <code>class</code> syntax includes <code>constructor()</code> for initialization, methods, <code>extends</code> for inheritance, and <code>super()</code> to call the parent class. Static methods belong to the class itself, not instances.',
+     challenge:{type:'mcq', question:'Inside a class, which method is automatically called when a new instance is created with new?',
+       options:['init()','create()','constructor()','new()'], correct:2,
+       explain:'<code>constructor()</code> is a special method that runs automatically when you create a new instance with <code>new MyClass()</code>. It\'s used to initialize properties. If you don\'t define one, a default empty constructor is used.'}},
+    {id:'w7l5', name:'The Grand Grimoire', xp:75, type:'match',
+     lesson:'Modern JavaScript (ES6+) introduced many powerful features. Mastering these separates junior from senior developers.',
+     challenge:{type:'match', question:'Match each ES6+ feature to its example or description:',
+       pairs:[{item:'Destructuring',match:'const {x,y} = obj'},{item:'Symbol',match:'Unique, immutable key'},{item:'WeakMap',match:'GC-friendly key-value'},{item:'Generator fn',match:'function* yields values'}],
+       explain:'<strong>Destructuring</strong> unpacks object/array values. <strong>Symbol</strong> creates truly unique keys. <strong>WeakMap</strong> holds weak references (allows garbage collection). <strong>Generator functions</strong> use <code>yield</code> to produce a sequence of values lazily.'}}
+  ]
+}
+];
+
+const PLAYER_LEVELS = [
+  {threshold:0,title:'Novice',icon:'🌱'},
+  {threshold:200,title:'Apprentice',icon:'⚔️'},
+  {threshold:500,title:'Journeyman',icon:'🗡️'},
+  {threshold:900,title:'Adept',icon:'🧙'},
+  {threshold:1400,title:'Expert',icon:'🔮'},
+  {threshold:1900,title:'Master',icon:'🏆'},
+  {threshold:2450,title:'Archmage',icon:'👑'},
+];
+
+const WORLD_COLORS = ['#2d7a2d','#b8860b','#6b3da0','#c0392b','#1a7a6a','#2c5f8a','#8b2020'];
+const TYPE_LABELS = {mcq:'Multiple Choice',truefalse:'True or False',fillin:'Fill in the Blank',match:'Match the Pairs'};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let state = {
+  playerName: '',
+  xp: 0,
+  completedLevels: [],
+  earnedBadges: [],
+};
+let currentWorldId = null;
+let currentLevelId = null;
+let selectedAnswer = null;
+let matchState = {}; // slot->item mappings
+
+function loadState() {
+  const s = localStorage.getItem('jsquest_v2');
+  if (s) { try { state = JSON.parse(s); } catch(e){} }
+}
+function saveState() {
+  localStorage.setItem('jsquest_v2', JSON.stringify(state));
+}
+function getPlayerLevel() {
+  for (let i = PLAYER_LEVELS.length - 1; i >= 0; i--) {
+    if (state.xp >= PLAYER_LEVELS[i].threshold) return PLAYER_LEVELS[i];
+  }
+  return PLAYER_LEVELS[0];
+}
+function getNextLevelThreshold() {
+  const pl = getPlayerLevel();
+  const idx = PLAYER_LEVELS.findIndex(p => p.title === pl.title);
+  if (idx + 1 < PLAYER_LEVELS.length) return PLAYER_LEVELS[idx + 1].threshold;
+  return PLAYER_LEVELS[PLAYER_LEVELS.length - 1].threshold;
+}
+function isLevelDone(lid) { return state.completedLevels.includes(lid); }
+function isBadgeEarned(wid) { return state.earnedBadges.includes(wid); }
+function isWorldUnlocked(widx) {
+  if (widx === 0) return true;
+  const prev = WORLDS[widx - 1];
+  return prev.levels.every(l => isLevelDone(l.id));
+}
+function isLevelUnlocked(world, lidx) {
+  if (lidx === 0) return isWorldUnlocked(WORLDS.indexOf(world));
+  return isLevelDone(world.levels[lidx - 1].id);
+}
+function isWorldComplete(world) { return world.levels.every(l => isLevelDone(l.id)); }
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════
+function initParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + 'vw';
+    p.style.setProperty('--dur', (6 + Math.random() * 10) + 's');
+    p.style.setProperty('--delay', (Math.random() * 12) + 's');
+    p.style.setProperty('--drift', ((Math.random() - 0.5) * 80) + 'px');
+    p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+    if (Math.random() > 0.6) { p.style.background = '#3a9e5a'; }
+    container.appendChild(p);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// LANDING
+// ═══════════════════════════════════════════════════
+function beginQuest() {
+  const input = document.getElementById('name-input');
+  const name = input.value.trim() || 'Adventurer';
+  state.playerName = name;
+  saveState();
+  showScreen('screen-map');
+  renderMap();
+}
+
+document.getElementById('name-input').addEventListener('keypress', function(e){
+  if (e.key === 'Enter') beginQuest();
+});
+
+// ═══════════════════════════════════════════════════
+// MAP SCREEN
+// ═══════════════════════════════════════════════════
+function renderMap() {
+  updateHeaders();
+  const grid = document.getElementById('worlds-grid');
+  grid.innerHTML = WORLDS.map((w, wi) => {
+    const unlocked = isWorldUnlocked(wi);
+    const completed = isWorldComplete(w);
+    const badge = isBadgeEarned(w.id);
+    const doneCount = w.levels.filter(l => isLevelDone(l.id)).length;
+    const dots = w.levels.map((l, li) => {
+      const done = isLevelDone(l.id);
+      const active = !done && isLevelUnlocked(w, li);
+      return `<div class="progress-dot ${done?'done':active?'active':''}"></div>`;
+    }).join('');
+    return `
+    <div class="world-card ${!unlocked?'locked':''} ${completed?'completed':''}" 
+         onclick="${unlocked?`openWorld('${w.id}')`:''}" >
+      <div class="world-card-accent" style="background: linear-gradient(90deg, ${w.color}, transparent)"></div>
+      ${!unlocked ? '<span class="world-lock-icon">🔒</span>' : completed ? `<span class="world-complete-badge">${w.badge.icon}</span>` : `<span class="world-xp-badge">+${w.levels.reduce((s,l)=>s+l.xp,0)+w.worldXP} XP</span>`}
+      <span class="world-icon">${w.emoji}</span>
+      <div class="world-number">Realm ${wi+1}</div>
+      <div class="world-name">${w.name}</div>
+      <div class="world-topic">${w.subtitle}</div>
+      <div class="world-progress">
+        <div class="progress-dots">${dots}</div>
+        <span class="progress-text">${doneCount}/${w.levels.length}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openWorld(wid) {
+  currentWorldId = wid;
+  showScreen('screen-world');
+  renderWorldScreen();
+}
+
+// ═══════════════════════════════════════════════════
+// WORLD SCREEN
+// ═══════════════════════════════════════════════════
+function renderWorldScreen() {
+  updateHeaders();
+  const world = WORLDS.find(w => w.id === currentWorldId);
+  const wi = WORLDS.indexOf(world);
+  const badge = isBadgeEarned(world.id);
+  const body = document.getElementById('world-screen-body');
+  const levelsHTML = world.levels.map((lvl, li) => {
+    const done = isLevelDone(lvl.id);
+    const avail = isLevelUnlocked(world, li);
+    const status = done ? 'done' : avail ? 'available' : 'locked';
+    const statusIcon = done ? '✓' : avail ? '→' : '🔒';
+    const connector = li > 0 ? `<div class="level-connector"></div>` : '';
+    return `${connector}
+    <div class="level-item ${status}" onclick="${avail||done ? `startLevel('${lvl.id}')` : ''}">
+      <div class="level-status-icon ${status}">${statusIcon}</div>
+      <div class="level-info">
+        <div class="level-name">${lvl.name}</div>
+        <div class="level-type-tag">${TYPE_LABELS[lvl.type]}</div>
+      </div>
+      <div class="level-xp">+${lvl.xp} XP</div>
+    </div>`;
+  }).join('');
+
+  body.innerHTML = `
+    <button class="back-btn" onclick="showScreen('screen-map');renderMap()">← Back to Map</button>
+    <div class="world-screen-header">
+      <div class="world-screen-header-accent" style="background: linear-gradient(90deg, ${world.color}, transparent); position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0;"></div>
+      <span class="world-screen-icon">${world.emoji}</span>
+      <div class="world-screen-title">${world.name}</div>
+      <div class="world-screen-subtitle">${world.subtitle}</div>
+      <div class="world-screen-desc">${world.desc}</div>
+      <div class="world-badge-info">
+        ${badge ? `${world.badge.icon} Badge Earned: ${world.badge.name}` : `🏅 Complete all levels to earn the <strong>${world.badge.name}</strong> badge`}
+      </div>
+    </div>
+    <div class="levels-trail">${levelsHTML}</div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+// CHALLENGE SCREEN
+// ═══════════════════════════════════════════════════
+function startLevel(lid) {
+  currentLevelId = lid;
+  selectedAnswer = null;
+  matchState = {};
+  showScreen('screen-challenge');
+  renderChallenge();
+}
+
+function findLevel(lid) {
+  for (const w of WORLDS) {
+    const l = w.levels.find(l => l.id === lid);
+    if (l) return { world: w, level: l };
+  }
+  return null;
+}
+
+function renderChallenge() {
+  updateHeaders();
+  const { world, level } = findLevel(currentLevelId);
+  const c = level.challenge;
+  const body = document.getElementById('challenge-body');
+
+  let challengeHTML = '';
+  if (c.type === 'mcq') challengeHTML = renderMCQ(c);
+  else if (c.type === 'truefalse') challengeHTML = renderTF(c);
+  else if (c.type === 'fillin') challengeHTML = renderFill(c);
+  else if (c.type === 'match') challengeHTML = renderMatch(c);
+
+  body.innerHTML = `
+    <div class="challenge-breadcrumb">
+      <span onclick="showScreen('screen-map');renderMap()" style="cursor:pointer;color:var(--accent-green)">Map</span>
+      <span class="breadcrumb-sep">›</span>
+      <span onclick="openWorld('${world.id}')" style="cursor:pointer">${world.name}</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">${level.name}</span>
+    </div>
+    <div class="lesson-box">
+      <div class="lesson-text">${level.lesson}</div>
+    </div>
+    <div class="challenge-card">
+      <div class="challenge-meta">
+        <span class="challenge-type-badge">${TYPE_LABELS[c.type]}</span>
+        <span class="challenge-xp-hint">⭐ +${level.xp} XP on success</span>
+      </div>
+      <div class="challenge-question">${c.question || ''}</div>
+      ${challengeHTML}
+      <button class="btn-submit" id="submit-btn" onclick="submitAnswer()" ${c.type==='match'?'':' disabled'}>
+        ⚔ Submit Answer
+      </button>
+    </div>
+  `;
+
+  if (c.type === 'match') setupMatchHandlers(c);
+  if (c.type === 'fillin') {
+    const inp = document.getElementById('fill-input');
+    if (inp) inp.addEventListener('input', () => {
+      document.getElementById('submit-btn').disabled = inp.value.trim() === '';
+    });
+    inp.addEventListener('keypress', e => { if(e.key==='Enter' && inp.value.trim()) submitAnswer(); });
+  }
+}
+
+function renderMCQ(c) {
+  return `<div class="options-grid">
+    ${c.options.map((opt, i) => `
+      <button class="option-btn" data-idx="${i}" onclick="selectOption(${i})">
+        <span class="option-key">${['A','B','C','D'][i]}</span>
+        <span class="option-text">${opt}</span>
+      </button>`).join('')}
+  </div>`;
+}
+
+function renderTF(c) {
+  return `<div class="tf-statement">${c.statement}</div>
+  <div class="tf-container">
+    <button class="tf-btn true-btn" onclick="selectTF(true)">
+      <span class="tf-icon">✓</span> True
+    </button>
+    <button class="tf-btn false-btn" onclick="selectTF(false)">
+      <span class="tf-icon">✗</span> False
+    </button>
+  </div>`;
+}
+
+function renderFill(c) {
+  const codeStr = c.codeParts.join('___');
+  return `<div class="fill-code">${escHTML(codeStr)}</div>
+  <div class="fill-input-wrap">
+    <span class="fill-label">Fill the blank →</span>
+    <input type="text" id="fill-input" class="fill-input" placeholder="Type your answer..." autocomplete="off" spellcheck="false">
+  </div>`;
+}
+
+function renderMatch(c) {
+  const shuffled = [...c.pairs].sort(() => Math.random() - 0.5);
+  return `<p class="match-instruction">👆 Click an item on the left, then click a slot on the right to match it.</p>
+  <div class="match-container">
+    <div>
+      <div class="match-col-title">Items</div>
+      ${shuffled.map(p => `<div class="match-item" data-item="${escAttr(p.item)}" id="mi-${escAttr(p.item).replace(/[^a-z0-9]/gi,'_')}">${escHTML(p.item)}</div>`).join('')}
+    </div>
+    <div>
+      <div class="match-col-title">Definitions</div>
+      ${c.pairs.map(p => `
+        <div class="match-slot" data-target="${escAttr(p.match)}" id="ms-${escAttr(p.match).replace(/[^a-z0-9]/gi,'_')}">
+          <span class="slot-label">${escHTML(p.match)}</span>
+          <span class="slot-placed" id="sp-${escAttr(p.match).replace(/[^a-z0-9]/gi,'_')}"></span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+let selectedMatchItemEl = null;
+
+function setupMatchHandlers(c) {
+  document.querySelectorAll('.match-item').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.classList.contains('matched')) return;
+      document.querySelectorAll('.match-item').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedMatchItemEl = el;
+    });
+  });
+  document.querySelectorAll('.match-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      if (!selectedMatchItemEl) return;
+      const itemId = selectedMatchItemEl.dataset.item;
+      const target = slot.dataset.target;
+      // If slot already has something, release it back
+      if (matchState[target]) {
+        const prevItemId = matchState[target];
+        const prevEl = document.querySelector(`.match-item[data-item="${CSS.escape(prevItemId)}"]`);
+        if (prevEl) prevEl.classList.remove('matched');
+        // Remove from other matchState entries if needed
+        for (const k in matchState) { if (matchState[k] === prevItemId) delete matchState[k]; }
+        const sp = document.getElementById('sp-' + target.replace(/[^a-z0-9]/gi,'_'));
+        if (sp) sp.textContent = '';
+      }
+      // Also check if this item was placed elsewhere
+      for (const k in matchState) {
+        if (matchState[k] === itemId) {
+          delete matchState[k];
+          const sp2 = document.getElementById('sp-' + k.replace(/[^a-z0-9]/gi,'_'));
+          if (sp2) sp2.textContent = '';
+          const sl2 = document.querySelector(`.match-slot[data-target="${CSS.escape(k)}"]`);
+          if (sl2) sl2.classList.remove('filled');
+        }
+      }
+      matchState[target] = itemId;
+      selectedMatchItemEl.classList.remove('selected');
+      selectedMatchItemEl.classList.add('matched');
+      selectedMatchItemEl = null;
+      const sp = document.getElementById('sp-' + target.replace(/[^a-z0-9]/gi,'_'));
+      if (sp) sp.textContent = itemId;
+      slot.classList.add('filled');
+      // Enable submit when all slots filled
+      if (Object.keys(matchState).length === c.pairs.length) {
+        document.getElementById('submit-btn').disabled = false;
+      }
+    });
+  });
+}
+
+function selectOption(idx) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.option-btn')[idx].classList.add('selected');
+  selectedAnswer = idx;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function selectTF(val) {
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(val ? '.true-btn' : '.false-btn').classList.add('selected');
+  selectedAnswer = val;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════
+// SUBMIT & RESULT
+// ═══════════════════════════════════════════════════
+function submitAnswer() {
+  const { world, level } = findLevel(currentLevelId);
+  const c = level.challenge;
+  let correct = false;
+
+  if (c.type === 'mcq') {
+    correct = selectedAnswer === c.correct;
+  } else if (c.type === 'truefalse') {
+    correct = selectedAnswer === c.correct;
+  } else if (c.type === 'fillin') {
+    const val = document.getElementById('fill-input').value.trim();
+    correct = c.accept.some(a => val.toLowerCase().replace(/\s/g,'') === a.toLowerCase().replace(/\s/g,''));
+  } else if (c.type === 'match') {
+    correct = c.pairs.every(p => matchState[p.match] === p.item);
+  }
+
+  const alreadyDone = isLevelDone(currentLevelId);
+  let xpGained = 0;
+  let badgeEarned = null;
+
+  if (correct && !alreadyDone) {
+    state.completedLevels.push(currentLevelId);
+    state.xp += level.xp;
+    xpGained = level.xp;
+    // Check world completion
+    if (isWorldComplete(world) && !isBadgeEarned(world.id)) {
+      state.earnedBadges.push(world.id);
+      state.xp += world.worldXP;
+      xpGained += world.worldXP;
+      badgeEarned = world.badge;
+    }
+    saveState();
+  } else if (correct && alreadyDone) {
+    xpGained = 0; // Already completed
+  }
+
+  showResultScreen(correct, xpGained, c.explain, badgeEarned, level, world);
+}
+
+function showResultScreen(correct, xpGained, explanation, badge, level, world) {
+  showScreen('screen-result');
+  if (correct) spawnConfetti();
+
+  // Find next level
+  const wi = WORLDS.indexOf(world);
+  const li = world.levels.findIndex(l => l.id === currentLevelId);
+  let nextAction = '';
+  if (li + 1 < world.levels.length) {
+    nextAction = `startLevel('${world.levels[li+1].id}')`;
+  } else if (wi + 1 < WORLDS.length) {
+    nextAction = `openWorld('${WORLDS[wi+1].id}')`;
+  } else {
+    nextAction = `showScreen('screen-map');renderMap()`;
+  }
+
+  const card = document.getElementById('result-card');
+  const alreadyDone = xpGained === 0 && correct;
+
+  card.innerHTML = `
+    <span class="result-icon">${correct ? '⭐' : '💀'}</span>
+    <div class="result-title ${correct?'correct':'incorrect'}">${correct ? 'Correct!' : 'Not Quite...'}</div>
+    ${correct ? `<div class="result-xp">${xpGained > 0 ? `+${xpGained} XP earned!` : '(Already completed — no XP)'}</div>` : '<div class="result-xp" style="color:var(--text-mid)">Review the lore and try again</div>'}
+    ${badge ? `<div class="badge-unlock"><div class="badge-unlock-title">🏅 Badge Unlocked!</div><span class="badge-icon">${badge.icon}</span><div class="badge-name">${badge.name}</div></div>` : ''}
+    <div class="result-explanation"><strong>${correct?'Well done!':'The answer was:'}</strong><br>${explanation}</div>
+    <div class="result-btns">
+      ${!correct ? `<button class="btn-retry" onclick="startLevel('${currentLevelId}')">↺ Retry</button>` : ''}
+      <button class="btn-continue" onclick="${nextAction}">${li + 1 < world.levels.length ? '→ Next Level' : wi + 1 < WORLDS.length ? '⚔ Next Realm' : '🏆 View Map'}</button>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════
+function updateHeaders() {
+  const pl = getPlayerLevel();
+  const next = getNextLevelThreshold();
+  const curr = pl.threshold;
+  const pct = Math.min(100, ((state.xp - curr) / (next - curr)) * 100) || 0;
+
+  ['','2','3'].forEach(sfx => {
+    const n = document.getElementById('hdr-name' + (sfx===''?'':'-'+sfx));
+    const t = document.getElementById('hdr-title' + (sfx===''?'':'-'+sfx));
+    const ic = document.getElementById('hdr-icon' + (sfx===''?'':'-'+sfx));
+    const bar = document.getElementById('hdr-xp-bar' + (sfx===''?'':'-'+sfx));
+    const nums = document.getElementById('hdr-xp-nums' + (sfx===''?'':'-'+sfx));
+    if (n) n.textContent = state.playerName || 'Adventurer';
+    if (t) t.textContent = pl.title;
+    if (ic) ic.textContent = pl.icon;
+    if (bar) bar.style.width = pct + '%';
+    if (nums) nums.textContent = state.xp + ' / ' + next + ' XP';
+  });
+  const hb = document.getElementById('hdr-badges');
+  if (hb) hb.textContent = '🏅 ' + state.earnedBadges.length + ' / 7';
+}
+
+function spawnConfetti() {
+  const colors = ['#f5c842','#3a9e5a','#c0392b','#2c5f8a','#ffffff','#ff8c00'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = (20 + Math.random() * 60) + 'vw';
+    el.style.top = '0px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDelay = (Math.random() * 0.8) + 's';
+    el.style.animationDuration = (1 + Math.random() * 1.5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+}
+
+function escHTML(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(s) {
+  return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+loadState();
+initParticles();
+if (state.playerName) {
+  document.getElementById('name-input').value = state.playerName;
+}
+</script>
+</body>
+</html>
